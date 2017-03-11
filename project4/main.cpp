@@ -2,6 +2,7 @@
 
 #include "provided.h"
 #include "MyMap.h"
+#include "MapLoader.cpp"
 #include <string>
 using namespace std;
 #include <iostream>
@@ -18,5 +19,6 @@ int main()
     double* davidsGPA = nameToGPA.find("David");
     if (davidsGPA != nullptr)
         *davidsGPA = 1.5;
+    
     
 }

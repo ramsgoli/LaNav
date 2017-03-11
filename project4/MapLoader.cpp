@@ -1,4 +1,6 @@
 #include "provided.h"
+#include <iostream>
+#include <fstream>
 #include <string>
 using namespace std;
 
@@ -10,10 +12,15 @@ public:
 	bool load(string mapFile);
 	size_t getNumSegments() const;
 	bool getSegment(size_t segNum, StreetSegment& seg) const;
+    
+private:
+    int m_numSegments;
+    vector<StreetSegment*> m_streetSegments;
 };
 
 MapLoaderImpl::MapLoaderImpl()
 {
+    m_numSegments = 0;
 }
 
 MapLoaderImpl::~MapLoaderImpl()
@@ -22,12 +29,29 @@ MapLoaderImpl::~MapLoaderImpl()
 
 bool MapLoaderImpl::load(string mapFile)
 {
-	return false;  // This compiles, but may not be correct
+    int numLines = 0;
+    string line;
+    std::ifstream ifs (mapFile, std::ifstream::in);
+    if (ifs.is_open()) {
+        
+        while ( getline (ifs, line) )
+        {
+            numLines++;
+        }
+        ifs.close();
+        cout << "numLinse: " << numLines << endl;
+        return true;
+
+    }
+    
+    else {
+        return false;
+    }
 }
 
 size_t MapLoaderImpl::getNumSegments() const
 {
-	return 0; // This compiles, but may not be correct
+    return m_numSegments; // This compiles, but may not be correct
 }
 
 bool MapLoaderImpl::getSegment(size_t segNum, StreetSegment &seg) const
