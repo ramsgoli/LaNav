@@ -1,15 +1,7 @@
-//
-//  main.cpp
-//  project4
-//
-//  Created by Ram Goli on 3/9/17.
-//  Copyright © 2017 Ram Goli. All rights reserved.
-//
+// The main.cpp you can use for testing will replace this file soon.
 
-#include <iostream>
+#include "provided.h"
 
-int main(int argc, const char * argv[]) {
-    // insert code here...
-    std::cout << "Hello, World!\n";
-    return 0;
+int main()
+{
 }
