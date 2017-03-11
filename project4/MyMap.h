@@ -14,8 +14,12 @@ public:
         head = nullptr;
     }
     
-	//~MyMap();
-	//void clear();
+    ~MyMap() {
+        clear();
+    }
+    void clear() {
+        clearTree(head);
+    }
     int size() const {
         return m_numNodes;
     }
@@ -103,6 +107,15 @@ private:
             return searchFor(key, ptr->right);
         }
             
+    }
+    
+    void clearTree(node *ptr) {
+        if (ptr == nullptr)
+            return;
+        clearTree(ptr->left);
+        clearTree(ptr->right);
+        
+        delete ptr;
     }
     
 };
