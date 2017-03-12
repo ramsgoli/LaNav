@@ -2,7 +2,6 @@
 
 #include "provided.h"
 #include "MyMap.h"
-#include "MapLoader.cpp"
 #include <string>
 using namespace std;
 #include <iostream>
@@ -15,10 +14,14 @@ int main()
     nameToGPA.associate("Carey", 3.5); // Carey has a 3.5 GPA
     nameToGPA.associate("David", 3.99); // David beat Carey
     nameToGPA.associate("Abe", 3.2); // Abe has a 3.2 GPA
+    nameToGPA.associate("Zach", 1.1);
     
     double* davidsGPA = nameToGPA.find("David");
     if (davidsGPA != nullptr)
         *davidsGPA = 1.5;
+    
+    MapLoader mp;
+    mp.load("/Users/ramgoli/Documents/Winter2017/cs32/project4/project4/mapdata.txt");
     
     
 }

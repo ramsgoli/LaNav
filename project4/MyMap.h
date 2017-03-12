@@ -28,7 +28,7 @@ public:
         node *cur = head;
         for (;;) {
             if (key == cur->key) {
-                head->value = value;
+                cur->value = value;
                 return;
             }
             if (key < cur->key) {
