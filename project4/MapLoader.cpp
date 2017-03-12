@@ -48,14 +48,14 @@ bool MapLoaderImpl::load(string mapFile)
             
             string startLat = geocoordline.substr(0, geocoordline.find(','));
             geocoordline.erase(0, geocoordline.find(',') +1);
-            if (geocoordline[0] == ' ')
+            while (geocoordline[0] == ' ')
                 geocoordline.erase(0, 1);
             string startLong = geocoordline.substr(0, geocoordline.find(' '));
             geocoordline.erase(0, geocoordline.find(' ') +1);
             
             string endLat = geocoordline.substr(0, geocoordline.find(','));
             geocoordline.erase(0, geocoordline.find(',') +1);
-            if (geocoordline[0] == ' ')
+            while (geocoordline[0] == ' ')
                 geocoordline.erase(0, 1);
             string endLong = geocoordline;
             
@@ -63,7 +63,7 @@ bool MapLoaderImpl::load(string mapFile)
             
             vector<Attraction> va;
             
-            int numAttractions = stod(attractionumline.c_str());
+            int numAttractions = stod(attractionumline);
             for (int i = 0; i < numAttractions; i++) {
                 getline(myfile, locationLine);
                 string locationName = locationLine.substr(0, locationLine.find('|'));
@@ -73,7 +73,7 @@ bool MapLoaderImpl::load(string mapFile)
                 
                 string startLat = locationLine.substr(0, locationLine.find(','));
                 locationLine.erase(0, locationLine.find(',')+1);
-                if (locationLine[0] == ' ')
+                while (locationLine[0] == ' ')
                     locationLine.erase(0, 1);
                 string startLong = locationLine;
                 

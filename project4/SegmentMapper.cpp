@@ -1,4 +1,5 @@
 #include "provided.h"
+#include "MyMap.h"
 #include <vector>
 using namespace std;
 
@@ -9,6 +10,9 @@ public:
 	~SegmentMapperImpl();
 	void init(const MapLoader& ml);
 	vector<StreetSegment> getSegments(const GeoCoord& gc) const;
+    
+private:
+    MyMap<GeoCoord, vector<StreetSegment>> segmentmap;
 };
 
 SegmentMapperImpl::SegmentMapperImpl()
@@ -21,6 +25,8 @@ SegmentMapperImpl::~SegmentMapperImpl()
 
 void SegmentMapperImpl::init(const MapLoader& ml)
 {
+    
+    
 }
 
 vector<StreetSegment> SegmentMapperImpl::getSegments(const GeoCoord& gc) const

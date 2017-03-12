@@ -23,5 +23,16 @@ int main()
     MapLoader mp;
     mp.load("/Users/ramgoli/Documents/Winter2017/cs32/project4/project4/mapdata.txt");
     
+    AttractionMapper am;
+    am.init(mp);
     
+    GeoCoord fillMe;
+    string attraction = "The Coffee Bean & Tea Leaf";
+    
+    bool found = am.getGeoCoord(attraction, fillMe);
+    if (!found)
+    {
+        cout << "No geolocation found for " << attraction << endl;
+    } else
+        cout << "The location of " << attraction << " is " << fillMe.latitude << ", " << fillMe.longitude << endl;
 }

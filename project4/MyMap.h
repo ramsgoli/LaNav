@@ -15,7 +15,11 @@ public:
     }
     
 	//~MyMap();
-	//void clear();
+    void clear() {
+        FreeTree(head);
+        head = nullptr;
+    }
+    
     int size() const {
         return m_numNodes;
     }
@@ -103,6 +107,14 @@ private:
             return searchFor(key, ptr->right);
         }
             
+    }
+    
+    void FreeTree(node *cur) {
+        if (cur == nullptr)
+            return;
+        FreeTree(cur->left);
+        FreeTree(cur->right);
+        delete cur;
     }
     
 };
