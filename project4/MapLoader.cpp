@@ -18,11 +18,11 @@ public:
 private:
     int m_numSegments;
     vector<StreetSegment> m_streetSegments;
-    void processThreeLines(string line1, string line2, string line3);
 };
 
 MapLoaderImpl::MapLoaderImpl()
 {
+    m_numSegments = 0;
 }
 
 MapLoaderImpl::~MapLoaderImpl()
@@ -104,17 +104,21 @@ bool MapLoaderImpl::load(string mapFile)
 
 size_t MapLoaderImpl::getNumSegments() const
 {
-    return 0; // This compiles, but may not be correct
+    return m_numSegments; // This compiles, but may not be correct
 }
 
 bool MapLoaderImpl::getSegment(size_t segNum, StreetSegment &seg) const
 {
-    return false;  // This compiles, but may not be correct
-}
-
-void MapLoaderImpl::processThreeLines(string line1, string line2, string line3) {
+    if (segNum >= m_numSegments) {
+        return false;
+    }
+    
+    seg = m_streetSegments[segNum];
+    return true;
     
 }
+
+
 
 //******************** MapLoader functions ************************************
 
