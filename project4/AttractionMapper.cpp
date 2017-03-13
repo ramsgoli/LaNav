@@ -47,8 +47,6 @@ void AttractionMapperImpl::init(const MapLoader& ml)
 bool AttractionMapperImpl::getGeoCoord(string attraction, GeoCoord& gc) const
 {
     
-    cout << "name: " << attraction << endl;
-    
     for (int i = 0; i < attraction.size(); i++) {
         attraction[i] = tolower(attraction[i]);
     }

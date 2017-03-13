@@ -26,13 +26,25 @@ int main()
     AttractionMapper am;
     am.init(mp);
     
-    GeoCoord fillMe;
-    string attraction = "The Coffee Bean & Tea Leaf";
-    
-    bool found = am.getGeoCoord(attraction, fillMe);
-    if (!found)
+    SegmentMapper sm;
+    sm.init(mp); // let our object build its internal data structures
+    // by iterating thru all segments from the MapLoader object
+    GeoCoord lookMeUp("000", "-118.4417620");
+    std::vector<StreetSegment> vecOfAssociatedSegs(sm.getSegments(lookMeUp));
+    if (vecOfAssociatedSegs.empty())
     {
-        cout << "No geolocation found for " << attraction << endl;
-    } else
-        cout << "The location of " << attraction << " is " << fillMe.latitude << ", " << fillMe.longitude << endl;
+        cout << "Error - no segments found matching this coordinate\n";
+    }
+    cout << "Here are all the segments associated with your coordinate:" << endl;
+    for (auto s: vecOfAssociatedSegs)
+    {
+        cout << "Segment’s street: " << s.streetName << endl;
+        cout << "Segment’s start lat/long: " << s.segment.start.latitude << ", " << s.segment.start.longitude << endl;
+        cout << "Segment’s end lat/long: " << s.segment.end.latitude << ", " << s.segment.end.longitude << endl;
+        cout << "This segment has " << s.attractions.size() << " attractions on it." << endl;
+    }
+    
+    vector<NavSegment> ns;
+    Navigator n;
+    n.navigate("Covel Commons", "Regent", ns);
 }

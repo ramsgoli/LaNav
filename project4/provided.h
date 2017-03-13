@@ -158,7 +158,7 @@ inline double rad2deg(double rad) {
 	return rad * 180 / PI;
 }
 
-/**
+/*
 * Returns the distance between two points on the Earth.
 * Direct translation from http://en.wikipedia.org/wiki/Haversine_formula
 * @param lat1d Latitude of the first point in degrees

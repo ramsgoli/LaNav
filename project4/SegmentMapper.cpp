@@ -1,4 +1,5 @@
 #include "provided.h"
+#include "support.h"
 #include "MyMap.h"
 #include <vector>
 using namespace std;
@@ -25,14 +26,57 @@ SegmentMapperImpl::~SegmentMapperImpl()
 
 void SegmentMapperImpl::init(const MapLoader& ml)
 {
+    int numSegments = ml.getNumSegments();
     
+    for (int i = 0; i < numSegments; i++) {
+        StreetSegment ss;
+        ml.getSegment(i, ss);
+        GeoSegment gs = ss.segment;
+        vector<Attraction> va = ss.attractions;
+        
+        GeoCoord start = gs.start;
+        GeoCoord end = gs.end;
+        
+        vector<StreetSegment> *allSS;
+        allSS = segmentmap.find(start);
+        if (allSS == nullptr){
+            allSS = new vector<StreetSegment>;
+        }
+        
+        allSS->push_back(ss);
+        segmentmap.associate(start, *allSS);
+        
+        
+        allSS = segmentmap.find(end);
+        if (allSS == nullptr){
+            allSS = new vector<StreetSegment>;
+        }
+        allSS->push_back(ss);
+        segmentmap.associate(end, *allSS);
+        
+        for (int j = 0; j < va.size(); j++) {
+            GeoCoord gs = va[j].geocoordinates;
+            allSS = segmentmap.find(gs);
+            if (allSS == nullptr){
+                allSS = new vector<StreetSegment>;
+            }
+            allSS->push_back(ss);
+            segmentmap.associate(gs, *allSS);
+        }
+        
+    }
     
 }
 
 vector<StreetSegment> SegmentMapperImpl::getSegments(const GeoCoord& gc) const
 {
-	vector<StreetSegment> segments;
-	return segments;  // This compiles, but may not be correct
+    if (segmentmap.find(gc) == nullptr) {
+        vector<StreetSegment> emptyv;
+        return emptyv;
+    }
+    
+    return *(segmentmap.find(gc));
+    
 }
 
 //******************** SegmentMapper functions ********************************
