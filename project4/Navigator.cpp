@@ -121,7 +121,11 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
         for (int i = 0; i < topNodeStreetSegments.size(); i++) {
             for (int j = 0; j < endCoordStreetSegments.size(); j++) {
                 if (topNodeStreetSegments[i] == endCoordStreetSegments[j]) {
-                    cout << "we got a path nigga" << endl;
+                    node destination(endGeoCoord, 0);
+                    cameFrom.associate(destination, topNode);
+                    cout << "we got a path" << endl;
+                    cout << "path: " << endl;
+                    printPath(destination, cameFrom);
                     return NAV_SUCCESS;
                 }
             }
