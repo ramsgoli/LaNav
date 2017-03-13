@@ -24,6 +24,16 @@ struct node {
     
 };
 
+void printPath(node &shit, MyMap<node, node> &mapshit) {
+    GeoCoord gc = shit.gc;
+    cout << gc.latitudeText << ", "<< gc.longitudeText << endl;;
+    while (mapshit.find(shit)->gc != shit.gc) {
+        shit = *(mapshit.find(shit));
+        gc = shit.gc;
+        cout << gc.latitudeText << ", "<< gc.longitudeText << endl;;
+    }
+}
+
 
 class NavigatorImpl
 {
