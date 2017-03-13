@@ -42,3 +42,11 @@ bool operator==(const GeoCoord& x, const GeoCoord& y) {
     
     return false;
 }
+
+bool operator==(const GeoSegment& x, const GeoSegment& y) {
+    return (x.start == y.start && x.end == y.end);
+}
+
+bool operator==(const StreetSegment& x, const StreetSegment& y) {
+    return x.segment == y.segment;
+}

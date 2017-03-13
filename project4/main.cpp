@@ -31,20 +31,10 @@ int main()
     // by iterating thru all segments from the MapLoader object
     GeoCoord lookMeUp("000", "-118.4417620");
     std::vector<StreetSegment> vecOfAssociatedSegs(sm.getSegments(lookMeUp));
-    if (vecOfAssociatedSegs.empty())
-    {
-        cout << "Error - no segments found matching this coordinate\n";
-    }
-    cout << "Here are all the segments associated with your coordinate:" << endl;
-    for (auto s: vecOfAssociatedSegs)
-    {
-        cout << "Segment’s street: " << s.streetName << endl;
-        cout << "Segment’s start lat/long: " << s.segment.start.latitude << ", " << s.segment.start.longitude << endl;
-        cout << "Segment’s end lat/long: " << s.segment.end.latitude << ", " << s.segment.end.longitude << endl;
-        cout << "This segment has " << s.attractions.size() << " attractions on it." << endl;
-    }
-    
+        
     vector<NavSegment> ns;
     Navigator n;
-    n.navigate("Covel Commons", "Regent", ns);
+    n.navigate("Bollywood Bites", "Getty Center Helipad", ns);
+    
+    cout << "we here" << endl;
 }

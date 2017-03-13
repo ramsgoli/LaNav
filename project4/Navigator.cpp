@@ -4,15 +4,24 @@
 #include <queue>
 #include <string>
 #include <vector>
+#include <iostream>
 using namespace std;
 
 struct node {
+    
+    node(GeoCoord xgc, double xval) {
+        gc = xgc;
+        val = xval;
+    }
+    
+    node() {
+        val = 0;
+    }
     GeoCoord gc;
-    double disToEnd;
-    string name;
+    double val;
     bool operator<(const node &o) const
     {
-        return disToEnd > o.disToEnd;
+        return val > o.val;
     }
 };
 
@@ -37,8 +46,7 @@ private:
 NavigatorImpl::NavigatorImpl()
 {
     loadMapData("/Users/ramgoli/Documents/Winter2017/cs32/project4/project4/mapdata.txt");
-    sm.init(ml);
-    am.init(ml);
+    
 }
 
 NavigatorImpl::~NavigatorImpl()
@@ -47,15 +55,19 @@ NavigatorImpl::~NavigatorImpl()
 
 bool NavigatorImpl::loadMapData(string mapFile)
 {
-    if (ml.load(mapFile))
+    if (ml.load(mapFile)) {
+        sm.init(ml);
+        am.init(ml);
         return true;
+    }
 	return false;  // This compiles, but may not be correct
 }
 
 NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &directions) const
 {
+    bool found = false;
     priority_queue<node> m_nodequeue;
-    list<node> finalPath;
+    vector<node> finalPath;
     
     node startCoord;
     if (!am.getGeoCoord(start, startCoord.gc))
@@ -65,10 +77,69 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
     if (!am.getGeoCoord(end, endCoord))
         return NAV_BAD_DESTINATION;
     
-    startCoord.disToEnd = distanceEarthMiles(startCoord.gc, endCoord);
-    startCoord.name = start;
+    startCoord.val = distanceEarthMiles(startCoord.gc, endCoord);
     m_nodequeue.push(startCoord);
     
+    vector<StreetSegment> segmentsassociatedwithend = sm.getSegments(endCoord);
+    vector<StreetSegment> segmentsassociatedwithtop = sm.getSegments(m_nodequeue.top().gc);
+    finalPath.push_back(m_nodequeue.top());
+    
+    for (int i = 0; i < segmentsassociatedwithtop.size(); i++) {
+        GeoCoord segStartCoord = segmentsassociatedwithtop[i].segment.start;
+        GeoCoord segEndCoord = segmentsassociatedwithtop[i].segment.end;
+        
+        double segStartCoordVal = distanceEarthMiles(segStartCoord, endCoord) + distanceEarthMiles(segStartCoord, m_nodequeue.top().gc);
+        double segEndCoordVal = distanceEarthMiles(segEndCoord, endCoord) + distanceEarthMiles(segEndCoord, m_nodequeue.top().gc);
+        
+        m_nodequeue.pop();
+        m_nodequeue.push(node(segStartCoord, segStartCoordVal));
+        m_nodequeue.push(node(segEndCoord, segEndCoordVal));
+    }
+    
+    while (!m_nodequeue.empty()) {
+        
+        GeoCoord currentlyProcessingGeoCoord = m_nodequeue.top().gc;
+        segmentsassociatedwithtop = sm.getSegments(currentlyProcessingGeoCoord);
+        finalPath.push_back(m_nodequeue.top());
+        m_nodequeue.pop();
+        
+        for (int i = 0; i < segmentsassociatedwithtop.size(); i++) {
+            for (int j = 0; j < segmentsassociatedwithend.size(); j++) {
+                if (segmentsassociatedwithtop[i] == segmentsassociatedwithend[j]) {
+                    finalPath.push_back(node(endCoord, 0));
+                    cout << "We found a route between " << start << " and " << end << endl;
+                    return NAV_SUCCESS;
+                }
+            }
+        }
+        
+        for (int i = 0; i < segmentsassociatedwithtop.size(); i++) {
+            GeoCoord nextSegment;
+            
+            if (segmentsassociatedwithtop[i].segment.start == currentlyProcessingGeoCoord) {
+                nextSegment = segmentsassociatedwithtop[i].segment.end;
+            } else {
+                nextSegment = segmentsassociatedwithtop[i].segment.start;
+            }
+            
+            bool alreadyVisited = false;
+            
+            for (int i = 0; i < finalPath.size(); i++) {
+                if (finalPath[i].gc == nextSegment)
+                    alreadyVisited = true;
+            }
+            if (alreadyVisited)
+                continue;
+            
+            double nextSegmentVal = distanceEarthMiles(nextSegment, endCoord) + distanceEarthMiles(currentlyProcessingGeoCoord, nextSegment);
+            m_nodequeue.push(node(nextSegment, nextSegmentVal));
+            
+        }
+
+
+    }
+    
+    cout << "no route..." << endl;
     
 	return NAV_NO_ROUTE;  // This compiles, but may not be correct
 }
