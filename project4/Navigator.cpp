@@ -18,6 +18,7 @@ struct node {
     node() {
         val = 0;
     }
+    
     GeoCoord gc;
     double val;
     
@@ -38,6 +39,7 @@ private:
     MapLoader ml;
     
     void calculateNavSegments(const vector<NavSegment>& navsegments, vector<node>& nodes) const;
+    double cost(const GeoCoord &start, const GeoCoord &next, const GeoCoord &final) const;
     
     //some minheap
     
@@ -68,6 +70,8 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
     MyMap<node, node> cameFrom;
     MyMap<node, double> currentCost;
     
+    vector<node> finalPath;
+    
     GeoCoord startGeoCoord;
     am.getGeoCoord(start, startGeoCoord);
     
@@ -85,6 +89,7 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
     
     while (!m_queue.empty()) {
         node topNode = m_queue.top();
+        finalPath.push_back(topNode);
         m_queue.pop();
         
         //check if we hit the right place
@@ -98,13 +103,64 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
             }
         }
         
-        
+        vector<StreetSegment> streetSegmentsAssociatedWithCurr = sm.getSegments(topNode.gc);
+        for (int i = 0; i < streetSegmentsAssociatedWithCurr.size(); i++) {
+            StreetSegment nextStreet = streetSegmentsAssociatedWithCurr[i];
+            GeoSegment nextSeg = nextStreet.segment;
+            
+            if (nextSeg.start == topNode.gc) //the 'start' coord is the same as the current one. pick the 'end' coord;
+            {
+                GeoCoord nextCoord = nextSeg.end;
+                double newCost = topNode.val + cost(topNode.gc, nextCoord, endGeoCoord);
+                if (sm.getSegments(nextCoord).size() != 0 || newCost < *(currentCost.find(topNode))) {
+                    node nextCoordNode(nextCoord, newCost);
+                    m_queue.push(nextCoordNode);
+                    currentCost.associate(nextCoordNode, newCost);
+                    cameFrom.associate(nextCoordNode, topNode);
+                }
+            } else if (nextSeg.end == topNode.gc) //the 'start' coord is the same as the current one. pick the 'end' coord;
+            {
+                GeoCoord nextCoord = nextSeg.start;
+                double newCost = topNode.val + cost(topNode.gc, nextCoord, endGeoCoord);
+                if (sm.getSegments(nextCoord).size() != 0 || newCost < *(currentCost.find(topNode))) {
+                    node nextCoordNode(nextCoord, newCost);
+                    m_queue.push(nextCoordNode);
+                    currentCost.associate(nextCoordNode, newCost);
+                    cameFrom.associate(nextCoordNode, topNode);
+                }
+            } else //the geocoord is in the middle of the segment. push both!
+            {
+                GeoCoord firstNextCoord = nextSeg.start;
+                GeoCoord secondNextCoord = nextSeg.end;
+                double firstNewCost = topNode.val + cost(topNode.gc, firstNextCoord, endGeoCoord);
+                double secondNewCost = topNode.val + cost(topNode.gc, secondNextCoord, endGeoCoord);
+                
+                if (sm.getSegments(firstNextCoord).size() != 0 || firstNewCost < *(currentCost.find(topNode))) {
+                    node nextCoordNode(firstNextCoord, firstNewCost);
+                    m_queue.push(nextCoordNode);
+                    currentCost.associate(nextCoordNode, firstNewCost);
+                    cameFrom.associate(nextCoordNode, topNode);
+                }
+                
+                if (sm.getSegments(secondNextCoord).size() != 0 || secondNewCost < *(currentCost.find(topNode))) {
+                    node nextCoordNode(secondNextCoord, secondNewCost);
+                    m_queue.push(nextCoordNode);
+                    currentCost.associate(nextCoordNode, secondNewCost);
+                    cameFrom.associate(nextCoordNode, topNode);
+                }
+            }
+        }
         
     }
     
     
     
 	return NAV_NO_ROUTE;  // This compiles, but may not be correct
+}
+
+double NavigatorImpl::cost(const GeoCoord &start, const GeoCoord &next, const GeoCoord &final) const {
+    
+    return distanceEarthMiles(start, next) + distanceEarthMiles(next, final);
 }
 
 void NavigatorImpl::calculateNavSegments(const vector<NavSegment>& navsegments, vector<node>& nodes) const {

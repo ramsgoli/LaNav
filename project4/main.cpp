@@ -34,7 +34,7 @@ int main()
         
     vector<NavSegment> ns;
     Navigator n;
-    n.navigate("Getty Center Helipad", "Bollywood Bites",  ns);
+    n.navigate("Westwood Copies", "El Pollo Loco",  ns);
     
     cout << "we here" << endl;
 }
