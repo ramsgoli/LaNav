@@ -39,6 +39,8 @@ private:
     AttractionMapper am;
     MapLoader ml;
     
+    void calculateNavSegments(const vector<NavSegment>& navsegments, vector<node>& nodes) const;
+    
     //some minheap
     
 };
@@ -108,6 +110,7 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
                 if (segmentsassociatedwithtop[i] == segmentsassociatedwithend[j]) {
                     finalPath.push_back(node(endCoord, 0));
                     cout << "We found a route between " << start << " and " << end << endl;
+                    calculateNavSegments(directions, finalPath);
                     return NAV_SUCCESS;
                 }
             }
@@ -143,6 +146,11 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
     
 	return NAV_NO_ROUTE;  // This compiles, but may not be correct
 }
+
+void NavigatorImpl::calculateNavSegments(const vector<NavSegment>& navsegments, vector<node>& nodes) const {
+    
+}
+
 
 //******************** Navigator functions ************************************
 
