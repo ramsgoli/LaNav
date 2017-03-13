@@ -19,6 +19,20 @@ struct node {
         val = 0;
     }
     
+    bool operator<(const node &o) const
+    {
+        return val > o.val;
+    }
+    
+    bool operator>(const node &o) const {
+        return val < o.val;
+    }
+    
+    bool operator==(const node &o) const {
+        return val==o.val;
+    }
+
+    
     GeoCoord gc;
     double val;
     

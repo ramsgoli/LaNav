@@ -43,6 +43,14 @@ bool operator==(const GeoCoord& x, const GeoCoord& y) {
     return false;
 }
 
+bool operator!=(const GeoCoord& x, const GeoCoord& y) {
+    if (x.latitude != y.latitude)
+        if (x.longitude != y.longitude)
+            return true;
+    
+    return false;
+}
+
 bool operator==(const GeoSegment& x, const GeoSegment& y) {
     return (x.start == y.start && x.end == y.end);
 }

@@ -16,7 +16,7 @@ bool operator>(const GeoCoord& x, const GeoCoord& y);
 bool operator<(const GeoCoord& x, const GeoCoord& y);
 
 bool operator==(const GeoCoord& x, const GeoCoord& y);
-
+bool operator!=(const GeoCoord& x, const GeoCoord& y);
 
 bool operator==(const GeoSegment& x, const GeoSegment& y);
 bool operator==(const StreetSegment& x, const StreetSegment& y);
