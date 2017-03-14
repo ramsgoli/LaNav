@@ -34,7 +34,7 @@ int main()
         
     vector<NavSegment> ns;
     Navigator n;
-    n.navigate("Bollywood Bites", "Hedrick Hall",  ns);
+    n.navigate( "Giorgio Armani", "Hedrick Hall",  ns);
     
     cout << "we here" << endl;
 }

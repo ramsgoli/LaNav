@@ -39,14 +39,15 @@ struct node {
     
 };
 
-void printPath(node &shit, MyMap<node, node> &mapshit) {
-    GeoCoord gc = shit.gc;
-    cout << gc.latitudeText << ", "<< gc.longitudeText << endl;;
-    while (mapshit.find(shit)->gc != shit.gc) {
+void printPath(GeoCoord &shit, MyMap<GeoCoord, GeoCoord> &mapshit) {
+    int count = 0;
+    cout << shit.latitudeText << ", "<< shit.longitudeText << endl;
+    while (*mapshit.find(shit) != shit) {
         shit = *(mapshit.find(shit));
-        gc = shit.gc;
-        cout << gc.latitudeText << ", "<< gc.longitudeText << endl;;
+        cout << shit.latitudeText << ", "<< shit.longitudeText << endl;
+        count++;
     }
+    cout << count << " coordinates traveled through" << endl;
 }
 
 
@@ -94,10 +95,10 @@ bool NavigatorImpl::loadMapData(string mapFile)
 
 NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &directions) const
 {
-    MyMap<node, node> cameFrom;
-    MyMap<GeoCoord, double> currentCost;
     
-    vector<node> finalPath;
+    int count = 0;
+    MyMap<GeoCoord, GeoCoord> cameFrom;
+    MyMap<GeoCoord, double> currentCost;
     
     GeoCoord startGeoCoord;
     am.getGeoCoord(start, startGeoCoord);
@@ -109,15 +110,14 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
     node startCoordNode(startGeoCoord, distanceEarthMiles(startGeoCoord, endGeoCoord), start);
     m_queue.push(startCoordNode);
     
-    cameFrom.associate(startCoordNode, startCoordNode);
+    cameFrom.associate(startGeoCoord, startGeoCoord);
     currentCost.associate(startGeoCoord, 0);
     
     vector<StreetSegment> endCoordStreetSegments = sm.getSegments(endGeoCoord);
     
     while (!m_queue.empty()) {
-        node topNode = m_queue.top();
-        finalPath.push_back(topNode);
         
+        node topNode = m_queue.top();
         m_queue.pop();
         
         //check if we hit the right place
@@ -125,43 +125,48 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
         for (int i = 0; i < topNodeStreetSegments.size(); i++) {
             for (int j = 0; j < endCoordStreetSegments.size(); j++) {
                 if (topNodeStreetSegments[i] == endCoordStreetSegments[j]) {
-                    node destination(endGeoCoord, 0, end);
-                    cameFrom.associate(destination, topNode);
+                    cameFrom.associate(endGeoCoord, topNode.gc);
                     cout << "we got a path" << endl;
                     cout << "path: " << endl;
-                    printPath(destination, cameFrom);
+                    printPath(endGeoCoord, cameFrom);
                     return NAV_SUCCESS;
                 }
             }
         }
         
-        vector<StreetSegment> streetSegmentsAssociatedWithCurr = sm.getSegments(topNode.gc);
-        for (int i = 0; i < streetSegmentsAssociatedWithCurr.size(); i++) {
-            StreetSegment nextStreet = streetSegmentsAssociatedWithCurr[i];
+        for (int i = 0; i < topNodeStreetSegments.size(); i++) {
+            StreetSegment nextStreet = topNodeStreetSegments[i];
             GeoSegment nextSeg = nextStreet.segment;
             
             if (nextSeg.start == topNode.gc) //the 'start' coord is the same as the current one. pick the 'end' coord;
             {
                 GeoCoord nextCoord = nextSeg.end;
-                double newCost = *(currentCost.find(topNode.gc)) + distFromTwo(topNode.gc, nextCoord);
-                if (sm.getSegments(nextCoord).size() != 0 || newCost < *(currentCost.find(nextCoord))) {
-                    currentCost.associate(nextCoord, newCost);
-                    double val = newCost + distFromTwo(nextCoord, endGeoCoord);
-                    node nextCoordNode(nextCoord, val, nextStreet.streetName);
-                    m_queue.push(nextCoordNode);
-                    cameFrom.associate(nextCoordNode, topNode);
+                if (*(cameFrom.find(topNode.gc)) != nextCoord) {
+                    double newCost = *(currentCost.find(topNode.gc)) + distFromTwo(topNode.gc, nextCoord);
+                    if (currentCost.find(nextCoord) == nullptr || newCost < *(currentCost.find(nextCoord))) {
+                        currentCost.associate(nextCoord, newCost);
+                        double val = newCost + distFromTwo(nextCoord, endGeoCoord);
+                        node nextCoordNode(nextCoord, val, nextStreet.streetName);
+                        m_queue.push(nextCoordNode);
+                        cameFrom.associate(nextCoord, topNode.gc);
+                    }
                 }
+                
             } else if (nextSeg.end == topNode.gc) //the 'start' coord is the same as the current one. pick the 'end' coord;
             {
                 GeoCoord nextCoord = nextSeg.start;
-                double newCost = *(currentCost.find(topNode.gc)) + distFromTwo(topNode.gc, nextCoord);
-                if (sm.getSegments(nextCoord).size() != 0 || newCost < *(currentCost.find(nextCoord))) {
-                    currentCost.associate(nextCoord, newCost);
-                    double val = newCost + distFromTwo(nextCoord, endGeoCoord);
-                    node nextCoordNode(nextCoord, val, nextStreet.streetName);
-                    m_queue.push(nextCoordNode);
-                    cameFrom.associate(nextCoordNode, topNode);
+                if (*(cameFrom.find(topNode.gc)) != nextCoord) {
+                    double newCost = *(currentCost.find(topNode.gc)) + distFromTwo(topNode.gc, nextCoord);
+                    if (currentCost.find(nextCoord) == nullptr || newCost < *(currentCost.find(nextCoord))) {
+                        currentCost.associate(nextCoord, newCost);
+                        double val = newCost + distFromTwo(nextCoord, endGeoCoord);
+                        node nextCoordNode(nextCoord, val, nextStreet.streetName);
+                        m_queue.push(nextCoordNode);
+                        cameFrom.associate(nextCoord, topNode.gc);
+                    }
                 }
+            
+                //this else case should only be hit once, at the very beginning
             } else //the geocoord is in the middle of the segment. push both!
             {
                 GeoCoord firstNextCoord = nextSeg.start;
@@ -169,28 +174,33 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
                 double firstNewCost = *(currentCost.find(topNode.gc)) + distFromTwo(topNode.gc, firstNextCoord);
                 double secondNewCost = *(currentCost.find(topNode.gc)) + distFromTwo(topNode.gc, secondNextCoord);
                 
-                if (sm.getSegments(firstNextCoord).size() != 0 || firstNewCost < *(currentCost.find(firstNextCoord))) {
-                    currentCost.associate(firstNextCoord, firstNewCost);
-                    double val = firstNewCost + distFromTwo(firstNextCoord, endGeoCoord);
-                    node nextCoordNode(firstNextCoord, val, nextStreet.streetName);
-                    m_queue.push(nextCoordNode);
-                    cameFrom.associate(nextCoordNode, topNode);
+                if (*(cameFrom.find(topNode.gc)) != firstNextCoord) {
+                    if (currentCost.find(firstNextCoord) == nullptr || firstNewCost < *(currentCost.find(firstNextCoord))) {
+                        currentCost.associate(firstNextCoord, firstNewCost);
+                        double val = firstNewCost + distFromTwo(firstNextCoord, endGeoCoord);
+                        node nextCoordNode(firstNextCoord, val, nextStreet.streetName);
+                        m_queue.push(nextCoordNode);
+                        cameFrom.associate(firstNextCoord, topNode.gc);
+                    }
                 }
                 
-                if (sm.getSegments(secondNextCoord).size() != 0 || secondNewCost < *(currentCost.find(secondNextCoord))) {
-                    currentCost.associate(secondNextCoord, secondNewCost);
-                    double val = secondNewCost + distFromTwo(secondNextCoord, endGeoCoord);
-                    node nextCoordNode(secondNextCoord, val, nextStreet.streetName);
-                    m_queue.push(nextCoordNode);
-                    cameFrom.associate(nextCoordNode, topNode);
+                if (*(cameFrom.find(topNode.gc)) != secondNextCoord) {
+                    if (currentCost.find(secondNextCoord) == nullptr || secondNewCost < *(currentCost.find(secondNextCoord))) {
+                        currentCost.associate(secondNextCoord, secondNewCost);
+                        double val = secondNewCost + distFromTwo(secondNextCoord, endGeoCoord);
+                        node nextCoordNode(secondNextCoord, val, nextStreet.streetName);
+                        m_queue.push(nextCoordNode);
+                        cameFrom.associate(secondNextCoord, topNode.gc);
+                    }
                 }
+                
             }
         }
         
     }
     
     
-    
+    cout << "no route..." << endl;
 	return NAV_NO_ROUTE;  // This compiles, but may not be correct
 }
 

@@ -36,16 +36,16 @@ bool operator<(const GeoCoord& x, const GeoCoord& y) {
 
 bool operator==(const GeoCoord& x, const GeoCoord& y) {
     
-    if (x.latitude == y.latitude)
-        if (x.longitude == y.longitude)
+    if (x.latitudeText == y.latitudeText)
+        if (x.longitudeText == y.longitudeText)
             return true;
     
     return false;
 }
 
 bool operator!=(const GeoCoord& x, const GeoCoord& y) {
-    if (x.latitude != y.latitude)
-        if (x.longitude != y.longitude)
+    if (x.latitudeText != y.latitudeText)
+        if (x.longitudeText != y.longitudeText)
             return true;
     
     return false;
