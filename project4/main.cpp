@@ -37,7 +37,7 @@ int main()
     Navigator n;
     
     
-    n.navigate( "1061 Broxton Avenue", "Headlines!",  ns);
+    n.navigate( "Fox Plaza", "Hedrick Hall",  ns);
     testNavSegments(ns);
     
 }

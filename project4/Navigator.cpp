@@ -253,7 +253,7 @@ void NavigatorImpl::printPath(GeoCoord &shit, MyMap<GeoCoord, GeoCoord> &mapshit
                         dir = "left";
                     else
                         dir = "right";
-                    directions.insert(it, NavSegment(dir, directions[i+1].m_streetName));
+                    it = directions.insert(it, NavSegment(dir, directions[i+1].m_streetName));
                 }
             }
             return;
