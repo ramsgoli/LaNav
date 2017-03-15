@@ -14,7 +14,9 @@ public:
         head = nullptr;
     }
     
-	//~MyMap();
+    ~MyMap() {
+        clear();
+    }
     void clear() {
         FreeTree(head);
         head = nullptr;
