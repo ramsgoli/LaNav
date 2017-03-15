@@ -37,6 +37,10 @@ void SegmentMapperImpl::init(const MapLoader& ml)
         GeoCoord start = gs.start;
         GeoCoord end = gs.end;
         
+        if (end.latitudeText == "51.510220") {
+            
+        }
+        
         
         if (segmentmap.find(start) == nullptr){
             vector<StreetSegment> temp;
@@ -84,6 +88,7 @@ vector<StreetSegment> SegmentMapperImpl::getSegments(const GeoCoord& gc) const
     if (segmentmap.find(gc) == nullptr) {
         vector<StreetSegment> emptyv;
         return emptyv;
+        
     }
     
     return *(segmentmap.find(gc));

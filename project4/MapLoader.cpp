@@ -82,6 +82,7 @@ bool MapLoaderImpl::load(string mapFile)
                 a.name = locationName;
                 va.push_back(a);
             }
+           
             
             StreetSegment ss;
             ss.segment = gs;
