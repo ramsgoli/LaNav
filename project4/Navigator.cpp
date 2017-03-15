@@ -68,7 +68,7 @@ private:
 
 NavigatorImpl::NavigatorImpl()
 {
-    loadMapData("/Users/ramgoli/Documents/Winter2017/cs32/project4/project4/mapdata.txt");
+    //loadMapData("/Users/ramgoli/Documents/Winter2017/cs32/project4/project4/mapdata.txt");
     
 }
 
@@ -94,10 +94,13 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
     MyMap<GeoCoord, double> currentCost;
     
     GeoCoord startGeoCoord;
-    am.getGeoCoord(start, startGeoCoord);
+    if (!am.getGeoCoord(start, startGeoCoord))
+        return NAV_BAD_SOURCE;
     
     GeoCoord endGeoCoord;
-    am.getGeoCoord(end, endGeoCoord);
+    if (!am.getGeoCoord(end, endGeoCoord))
+        return NAV_BAD_DESTINATION;
+    
     priority_queue<node> m_queue;
     
     node startCoordNode(startGeoCoord, distanceEarthMiles(startGeoCoord, endGeoCoord), start);
@@ -120,8 +123,8 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
             for (int j = 0; j < endCoordStreetSegments.size(); j++) {
                 if (topNodeStreetSegments[i] == endCoordStreetSegments[j]) {
                     cameFrom.associate(endGeoCoord, topNode.gc);
-                    cout << "we got a path" << endl;
-                    cout << "path: " << endl;
+//                    cout << "we got a path" << endl;
+//                    cout << "path: " << endl;
                     printPath(endGeoCoord, cameFrom, directions);
                     return NAV_SUCCESS;
                 }
@@ -192,8 +195,8 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
         
     }
     
-    cout << "examined " << count << " coordinates" << endl;
-    cout << "no route..." << endl;
+//    cout << "examined " << count << " coordinates" << endl;
+//    cout << "no route..." << endl;
 	return NAV_NO_ROUTE;  // This compiles, but may not be correct
      
     
@@ -220,24 +223,26 @@ void NavigatorImpl::printPath(GeoCoord &shit, MyMap<GeoCoord, GeoCoord> &mapshit
     
     for (;;) {
         GeoCoord secondToEnd = *(mapshit.find(shit));
-    
+        bool found = false;
+        
             vector<StreetSegment> streetsFromEnd = sm.getSegments(shit);
             vector<StreetSegment> streetsFromSecondToEnd = sm.getSegments(secondToEnd);
             
             for (int i = 0; i < streetsFromEnd.size(); i++) {
                 for (int j = 0; j < streetsFromSecondToEnd.size(); j++) {
-                    if (streetsFromEnd[i].segment.start == streetsFromSecondToEnd[j].segment.start &&
-                        streetsFromEnd[i].segment.end == streetsFromSecondToEnd[j].segment.end) //we found the right segment
-                    {
-                        
-                        GeoSegment newS(secondToEnd, shit);
-                        
-                        NavSegment nav;
-                        nav.m_geoSegment = newS;
-                        nav.m_direction = getDirection(newS);
-                        nav.m_distance = distanceEarthMiles(shit, secondToEnd);
-                        nav.m_streetName=streetsFromEnd[i].streetName;
-                        directions.insert(directions.begin(), nav);
+                    if (!found) {
+                        if (streetsFromEnd[i].segment.start == streetsFromSecondToEnd[j].segment.start &&
+                            streetsFromEnd[i].segment.end == streetsFromSecondToEnd[j].segment.end) //we found the right segment
+                        {
+                            GeoSegment newS(secondToEnd, shit);
+                            NavSegment nav;
+                            nav.m_geoSegment = newS;
+                            nav.m_direction = getDirection(newS);
+                            nav.m_distance = distanceEarthMiles(shit, secondToEnd);
+                            nav.m_streetName=streetsFromEnd[i].streetName;
+                            directions.insert(directions.begin(), nav);
+                            found = true;
+                        }
                     }
                 }
             }
@@ -259,18 +264,6 @@ void NavigatorImpl::printPath(GeoCoord &shit, MyMap<GeoCoord, GeoCoord> &mapshit
             return;
         }
     }
-    
-//    if (streetsFromEnd[i].streetName != streetsFromSecondToEnd[j].streetName) { //we switched streets
-//        
-//        string dir;
-//        if (angleBetween2Lines(streetsFromEnd[i].segment, streetsFromSecondToEnd[j].segment) < 180) {
-//            dir = "LEFT";
-//        } else {
-//            dir = "RIGHT";
-//        }
-//        
-//        directions.insert(directions.begin(), NavSegment(dir, streetsFromEnd[i].streetName));
-//    }
 }
 
 string NavigatorImpl::getDirection(const GeoSegment &seg) const {

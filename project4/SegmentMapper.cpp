@@ -13,7 +13,7 @@ public:
 	vector<StreetSegment> getSegments(const GeoCoord& gc) const;
     
 private:
-    MyMap<GeoCoord, vector<StreetSegment>> segmentmap;
+    MyMap<GeoCoord, vector<StreetSegment> > segmentmap;
 };
 
 SegmentMapperImpl::SegmentMapperImpl()
@@ -39,29 +39,36 @@ void SegmentMapperImpl::init(const MapLoader& ml)
         
         vector<StreetSegment> *allSS;
         allSS = segmentmap.find(start);
+        
         if (allSS == nullptr){
-            allSS = new vector<StreetSegment>;
+            vector<StreetSegment> temp;
+            temp.push_back(ss);
+            segmentmap.associate(start, temp);
+        } else {
+            vector<StreetSegment> *temp = segmentmap.find(start);
+            temp->push_back(ss);
         }
         
-        allSS->push_back(ss);
-        segmentmap.associate(start, *allSS);
+        vector<StreetSegment> *endss;
+        endss = segmentmap.find(end);
         
-        
-        allSS = segmentmap.find(end);
-        if (allSS == nullptr){
-            allSS = new vector<StreetSegment>;
+        if (endss == nullptr) {
+            vector<StreetSegment> temp;
+            temp.push_back(ss);
+            segmentmap.associate(end, temp);
         }
-        allSS->push_back(ss);
-        segmentmap.associate(end, *allSS);
+        
         
         for (int j = 0; j < va.size(); j++) {
             GeoCoord gs = va[j].geocoordinates;
             allSS = segmentmap.find(gs);
             if (allSS == nullptr){
-                allSS = new vector<StreetSegment>;
+                vector<StreetSegment> temp;
+                temp.push_back(ss);
+                segmentmap.associate(gs, temp);
+            } else {
+                segmentmap.find(gs)->push_back(ss);
             }
-            allSS->push_back(ss);
-            segmentmap.associate(gs, *allSS);
         }
         
     }
