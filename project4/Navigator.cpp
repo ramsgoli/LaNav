@@ -114,11 +114,12 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
     currentCost.associate(startGeoCoord, 0);
     
     vector<StreetSegment> endCoordStreetSegments = sm.getSegments(endGeoCoord);
-    
+
     while (!m_queue.empty()) {
         
         node topNode = m_queue.top();
         m_queue.pop();
+        count++;
         
         //check if we hit the right place
         vector<StreetSegment> topNodeStreetSegments = sm.getSegments(topNode.gc);
@@ -166,7 +167,6 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
                     }
                 }
             
-                //this else case should only be hit once, at the very beginning
             } else //the geocoord is in the middle of the segment. push both!
             {
                 GeoCoord firstNextCoord = nextSeg.start;
@@ -199,9 +199,11 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
         
     }
     
-    
+    cout << "examined " << count << " coordinates" << endl;
     cout << "no route..." << endl;
 	return NAV_NO_ROUTE;  // This compiles, but may not be correct
+     
+    
 }
 
 double NavigatorImpl::cost(const GeoCoord &start, const GeoCoord &next, const GeoCoord &final) const {
