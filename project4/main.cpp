@@ -111,6 +111,7 @@
 #include <string>
 #include <vector>
 #include <cstring>
+#include <cassert>
 using namespace std;
 
 // START OF WHAT YOU CAN REMOVE ONCE YOU'VE IMPLEMENTED string directionOfLine(const GeoSegment& gs)
@@ -157,57 +158,66 @@ void printDirections(string start, string end, vector<NavSegment>& navSegments);
 
 int main(int argc, char *argv[])
 {
-    bool raw = false;
-    if (argc == 5  &&  strcmp(argv[4], "-raw") == 0)
-    {
-        raw = true;
-        argc--;
-    }
-    if (argc != 4)
-    {
-        cout << "Usage: BruinNav mapdata.txt \"start attraction\" \"end attraction name\"" << endl
-        << "or" << endl
-        << "Usage: BruinNav mapdata.txt \"start attraction\" \"end attraction name\" -raw" << endl;
-        return 1;
-    }
     
-    Navigator nav;
-    
-    if ( ! nav.loadMapData(argv[1]))
-    {
-        cout << "Map data file was not found or has bad format: " << argv[1] << endl;
-        return 1;
-    }
-    
-    if ( ! raw)
-        cout << "Routing..." << flush;
-    
-    string start = argv[2];
-    string end = argv[3];
-    vector<NavSegment> navSegments;
-    
-    NavResult result = nav.navigate(start, end, navSegments);
-    if ( ! raw)
-        cout << endl;
-    
-    switch (result)
-    {
-        case NAV_NO_ROUTE:
-            cout << "No route found between " << start << " and " << end << endl;
-            break;
-        case NAV_BAD_SOURCE:
-            cout << "Start attraction not found: " << start << endl;
-            break;
-        case NAV_BAD_DESTINATION:
-            cout << "End attraction not found: " << end << endl;
-            break;
-        case NAV_SUCCESS:
-            if (raw)
-                printDirectionsRaw(start, end, navSegments);
-            else
-                printDirections(start, end, navSegments);
-            break;
-    }
+    MapLoader ml;
+    assert(ml.load("/Users/ramgoli/Documents/Winter2017/cs32/project4/project4/testmap.txt"));
+    SegmentMapper sm;
+    sm.init(ml);
+    GeoCoord gc("51.510087", "-0.134563");
+    vector<StreetSegment> vss = sm.getSegments(gc);
+    assert(vss.size() == 4);
+
+//    bool raw = false;
+//    if (argc == 5  &&  strcmp(argv[4], "-raw") == 0)
+//    {
+//        raw = true;
+//        argc--;
+//    }
+//    if (argc != 4)
+//    {
+//        cout << "Usage: BruinNav mapdata.txt \"start attraction\" \"end attraction name\"" << endl
+//        << "or" << endl
+//        << "Usage: BruinNav mapdata.txt \"start attraction\" \"end attraction name\" -raw" << endl;
+//        return 1;
+//    }
+//    
+//    Navigator nav;
+//    
+//    if ( ! nav.loadMapData(argv[1]))
+//    {
+//        cout << "Map data file was not found or has bad format: " << argv[1] << endl;
+//        return 1;
+//    }
+//    
+//    if ( ! raw)
+//        cout << "Routing..." << flush;
+//    
+//    string start = argv[2];
+//    string end = argv[3];
+//    vector<NavSegment> navSegments;
+//    
+//    NavResult result = nav.navigate(start, end, navSegments);
+//    if ( ! raw)
+//        cout << endl;
+//    
+//    switch (result)
+//    {
+//        case NAV_NO_ROUTE:
+//            cout << "No route found between " << start << " and " << end << endl;
+//            break;
+//        case NAV_BAD_SOURCE:
+//            cout << "Start attraction not found: " << start << endl;
+//            break;
+//        case NAV_BAD_DESTINATION:
+//            cout << "End attraction not found: " << end << endl;
+//            break;
+//        case NAV_SUCCESS:
+//            if (raw)
+//                printDirectionsRaw(start, end, navSegments);
+//            else
+//                printDirections(start, end, navSegments);
+//            break;
+//    }
 }
 
 void printDirectionsRaw(string start, string end, vector<NavSegment>& navSegments)

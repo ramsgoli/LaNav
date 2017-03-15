@@ -37,16 +37,15 @@ void SegmentMapperImpl::init(const MapLoader& ml)
         GeoCoord start = gs.start;
         GeoCoord end = gs.end;
         
-        vector<StreetSegment> *allSS;
-        allSS = segmentmap.find(start);
         
-        if (allSS == nullptr){
+        if (segmentmap.find(start) == nullptr){
             vector<StreetSegment> temp;
             temp.push_back(ss);
             segmentmap.associate(start, temp);
         } else {
             vector<StreetSegment> *temp = segmentmap.find(start);
             temp->push_back(ss);
+            segmentmap.associate(start, *temp);
         }
         
         vector<StreetSegment> *endss;
@@ -56,18 +55,23 @@ void SegmentMapperImpl::init(const MapLoader& ml)
             vector<StreetSegment> temp;
             temp.push_back(ss);
             segmentmap.associate(end, temp);
+        } else {
+            vector<StreetSegment> *temp = segmentmap.find(end);
+            temp->push_back(ss);
+            segmentmap.associate(end, *temp);
         }
         
         
         for (int j = 0; j < va.size(); j++) {
             GeoCoord gs = va[j].geocoordinates;
-            allSS = segmentmap.find(gs);
-            if (allSS == nullptr){
+            if (segmentmap.find(gs) == nullptr){
                 vector<StreetSegment> temp;
                 temp.push_back(ss);
                 segmentmap.associate(gs, temp);
             } else {
-                segmentmap.find(gs)->push_back(ss);
+                vector<StreetSegment> *temp = segmentmap.find(gs);
+                temp->push_back(ss);
+                segmentmap.associate(gs, *temp);
             }
         }
         
