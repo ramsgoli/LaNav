@@ -107,7 +107,7 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
     m_queue.push(startCoordNode);
     
     cameFrom.associate(startGeoCoord, startGeoCoord); //associate the start node to itself because it obivously wasnt traveled to from anywhere
-    currentCost.associate(startGeoCoord, 0); //there is not cost to travel to the start node
+    currentCost.associate(startGeoCoord, 0); //there is no cost to travel to the start node
     
     vector<StreetSegment> endCoordStreetSegments = sm.getSegments(endGeoCoord);
 
@@ -116,101 +116,44 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
         node topNode = m_queue.top();
         m_queue.pop();
         
+        //check if we hit the right place. We're done!
+        if (topNode.gc == endGeoCoord) {
+            findNavSegments(topNode.gc, cameFrom, directions);
+            return NAV_SUCCESS;
+        }
+        
         vector<StreetSegment> topNodeStreetSegments = sm.getSegments(topNode.gc);
         
-        //check if we hit the right place
         for (int i = 0; i < topNodeStreetSegments.size(); i++) {
             for (int j = 0; j < endCoordStreetSegments.size(); j++) {
                 if (topNodeStreetSegments[i] == endCoordStreetSegments[j]) {
                     visitNewNode(topNode.gc, endGeoCoord, endGeoCoord, cameFrom, currentCost, m_queue);
-//                    double newCost = *(currentCost.find(topNode.gc)) + distFromTwo(topNode.gc, endGeoCoord);
-//                    if (currentCost.find(endGeoCoord) == nullptr || newCost < *(currentCost.find(endGeoCoord))) {
-//                        currentCost.associate(endGeoCoord, newCost);
-//                        double val = newCost;
-//                        node nextCoordNode(endGeoCoord, val);
-//                        m_queue.push(nextCoordNode);
-//                        cameFrom.associate(endGeoCoord, topNode.gc);
-//                    }
                 }
             }
-        }
-        
-        if (topNode.gc == endGeoCoord) {
-            findNavSegments(topNode.gc, cameFrom, directions);
-            return NAV_SUCCESS;
         }
         
         for (int i = 0; i < topNodeStreetSegments.size(); i++) {
             StreetSegment nextStreet = topNodeStreetSegments[i];
             GeoSegment nextSeg = nextStreet.segment;
             
-            if (nextSeg.start == topNode.gc) //the 'start' coord is the same as the current one. pick the 'end' coord;
+            if (nextSeg.start == topNode.gc) //the 'start' coord is the same as the current one. visit the 'end' coord;
             {
-                GeoCoord nextCoord = nextSeg.end;
-                visitNewNode(topNode.gc, nextCoord, endGeoCoord, cameFrom, currentCost, m_queue);
-//                if (*(cameFrom.find(topNode.gc)) != nextCoord) {
-//                    double newCost = *(currentCost.find(topNode.gc)) + distFromTwo(topNode.gc, nextCoord);
-//                    if (currentCost.find(nextCoord) == nullptr || newCost < *(currentCost.find(nextCoord))) {
-//                        currentCost.associate(nextCoord, newCost);
-//                        double val = newCost + distFromTwo(nextCoord, endGeoCoord);
-//                        node nextCoordNode(nextCoord, val);
-//                        m_queue.push(nextCoordNode);
-//                        cameFrom.associate(nextCoord, topNode.gc);
-//                    }
-//                }
-                
-            } else if (nextSeg.end == topNode.gc) //the 'start' coord is the same as the current one. pick the 'end' coord;
+                visitNewNode(topNode.gc, nextSeg.end, endGeoCoord, cameFrom, currentCost, m_queue);
+
+            } else if (nextSeg.end == topNode.gc) //the 'start' coord is the same as the current one. visit the 'end' coord;
             {
-                GeoCoord nextCoord = nextSeg.start;
-                visitNewNode(topNode.gc, nextCoord, endGeoCoord, cameFrom, currentCost, m_queue);
-//                if (*(cameFrom.find(topNode.gc)) != nextCoord) {
-//                    double newCost = *(currentCost.find(topNode.gc)) + distFromTwo(topNode.gc, nextCoord);
-//                    if (currentCost.find(nextCoord) == nullptr || newCost < *(currentCost.find(nextCoord))) {
-//                        currentCost.associate(nextCoord, newCost);
-//                        double val = newCost + distFromTwo(nextCoord, endGeoCoord);
-//                        node nextCoordNode(nextCoord, val);
-//                        m_queue.push(nextCoordNode);
-//                        cameFrom.associate(nextCoord, topNode.gc);
-//                    }
-//                }
-            
-            } else //the geocoord is in the middle of the segment. push both!
+                visitNewNode(topNode.gc, nextSeg.end, endGeoCoord, cameFrom, currentCost, m_queue);
+
+            } else //the geocoord is in the middle of the segment. visit both coordinates!
             {
-                GeoCoord firstNextCoord = nextSeg.start;
-                GeoCoord secondNextCoord = nextSeg.end;
-                visitNewNode(topNode.gc, firstNextCoord, endGeoCoord, cameFrom, currentCost, m_queue);
-                visitNewNode(topNode.gc, secondNextCoord, endGeoCoord, cameFrom, currentCost, m_queue);
-                
-//                double firstNewCost = *(currentCost.find(topNode.gc)) + distFromTwo(topNode.gc, firstNextCoord);
-//                double secondNewCost = *(currentCost.find(topNode.gc)) + distFromTwo(topNode.gc, secondNextCoord);
-//                
-//                if (*(cameFrom.find(topNode.gc)) != firstNextCoord) {
-//                    if (currentCost.find(firstNextCoord) == nullptr || firstNewCost < *(currentCost.find(firstNextCoord))) {
-//                        currentCost.associate(firstNextCoord, firstNewCost);
-//                        double val = firstNewCost + distFromTwo(firstNextCoord, endGeoCoord);
-//                        node nextCoordNode(firstNextCoord, val);
-//                        m_queue.push(nextCoordNode);
-//                        cameFrom.associate(firstNextCoord, topNode.gc);
-//                    }
-//                }
-//                
-//                if (*(cameFrom.find(topNode.gc)) != secondNextCoord) {
-//                    if (currentCost.find(secondNextCoord) == nullptr || secondNewCost < *(currentCost.find(secondNextCoord))) {
-//                        currentCost.associate(secondNextCoord, secondNewCost);
-//                        double val = secondNewCost + distFromTwo(secondNextCoord, endGeoCoord);
-//                        node nextCoordNode(secondNextCoord, val);
-//                        m_queue.push(nextCoordNode);
-//                        cameFrom.associate(secondNextCoord, topNode.gc);
-//                    }
-//                }
-                
+                visitNewNode(topNode.gc, nextSeg.start, endGeoCoord, cameFrom, currentCost, m_queue);
+                visitNewNode(topNode.gc, nextSeg.end, endGeoCoord, cameFrom, currentCost, m_queue);
             }
         }
-        
     }
     
-	return NAV_NO_ROUTE;  // This compiles, but may not be correct
-     
+    //if our queue is empty, we will have searched every damn coordinate that can be linked to the start coordinate, so return no route
+	return NAV_NO_ROUTE;
     
 }
 
@@ -218,11 +161,15 @@ void NavigatorImpl::visitNewNode(const GeoCoord &curr, const GeoCoord &next, con
                   MyMap<GeoCoord, double> &currentCost,
                 priority_queue<node> &m_queue) const {
     
-    if (*(cameFrom.find(curr)) != next) {
-        double newCost = *(currentCost.find(curr)) + distFromTwo(curr, next);
-        if (currentCost.find(next) == nullptr || newCost < *(currentCost.find(next))) {
+    if (*(cameFrom.find(curr)) != next) { //check that we are not backtracking
+        double newCost = *(currentCost.find(curr)) + distFromTwo(curr, next); //the cost of going to a coordinate is the distance to travel
+                                                                              //up to the current coordinate plus distance to new coordinate
+        
+        if (currentCost.find(next) == nullptr || newCost < *(currentCost.find(next))) { //if it is less efficient to travel to new coordinate
+                                                                                        //than any previous path already taken, dont check it
             currentCost.associate(next, newCost);
-            double val = newCost + distFromTwo(next, finalCoord);
+            double val = newCost + distFromTwo(next, finalCoord); //the heuristic value of the next coord is the distance it takes to travel
+                                                                  //to that coordinate plus the total euclidean distance to the end cooordinate
             node nextCoordNode(next, val);
             m_queue.push(nextCoordNode);
             cameFrom.associate(next, curr);
