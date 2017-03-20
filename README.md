@@ -2,6 +2,7 @@
 # LA NAV
 
 [![N|Solid](http://content.sportslogos.net/logos/35/882/thumbs/88247800.gif)](http://web.cs.ucla.edu/classes/winter17/cs32/)
+
 **Find the shortest path between two attractions in the Westwood, West Los Angeles, West Hollywood, Brentwood, and Santa Monica areas!**
 
 *Disclaimer: I am not responsible if you actually follow directions outputted by this program and cause mass chaos throughout LA. Use Google Maps if you really need to*
@@ -10,6 +11,7 @@ This program was developed as a final project for CS32 during the Winter Quarter
 
 ### Usage
 *Note: make file coming soon*
+
 clone this repo somewhere on your local machine
 ```sh
 $ make
