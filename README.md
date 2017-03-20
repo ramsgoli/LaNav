@@ -6,9 +6,10 @@
 
 *Disclaimer: I am not responsible if you actually follow directions outputted by this program and cause mass chaos throughout LA. Use Google Maps if you really need to*
 
-This program was developed during the Winter Quarter of 2017 at UCLA. 
+This program was developed as a final project for CS32 during the Winter Quarter of 2017 at UCLA. 
 
 ### Usage
+*Note: make file coming soon*
 clone this repo somewhere on your local machine
 ```sh
 $ make
@@ -24,6 +25,7 @@ validlocs.txt
 
 ### Map Data
 The map data used for this project was generously provided by [Carey Nachenberg](careynachenberg.weebly.com)
+
 It uses
   - http://www.latlong.net to look up latitude and longitude for any address
   - http://wiki.openstreetmap.org/wiki/Downloading_data#Choose_your_region

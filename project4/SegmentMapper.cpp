@@ -37,11 +37,6 @@ void SegmentMapperImpl::init(const MapLoader& ml)
         GeoCoord start = gs.start;
         GeoCoord end = gs.end;
         
-        if (end.latitudeText == "51.510220") {
-            
-        }
-        
-        
         if (segmentmap.find(start) == nullptr){
             vector<StreetSegment> temp;
             temp.push_back(ss);
